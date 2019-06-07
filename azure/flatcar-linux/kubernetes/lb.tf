@@ -75,7 +75,7 @@ resource "azurerm_lb_rule" "ingress-http" {
 
   protocol                = "Tcp"
   frontend_port           = 80
-  backend_port            = 80
+  backend_port            = 30080
   backend_address_pool_id = "${azurerm_lb_backend_address_pool.worker.id}"
   probe_id                = "${azurerm_lb_probe.ingress.id}"
 }
@@ -89,7 +89,7 @@ resource "azurerm_lb_rule" "ingress-https" {
 
   protocol                = "Tcp"
   frontend_port           = 443
-  backend_port            = 443
+  backend_port            = 30443
   backend_address_pool_id = "${azurerm_lb_backend_address_pool.worker.id}"
   probe_id                = "${azurerm_lb_probe.ingress.id}"
 }
