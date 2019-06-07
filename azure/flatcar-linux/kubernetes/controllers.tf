@@ -31,11 +31,6 @@ resource "azurerm_availability_set" "controllers" {
   managed                      = true
 }
 
-data "azurerm_image" "custom" {
-  name                = "${var.custom_image_name}"
-  resource_group_name = "${var.custom_image_resource_group_name}"
-}
-
 # Controller instances
 resource "azurerm_virtual_machine" "controllers" {
   count               = "${var.controller_count}"
@@ -48,7 +43,10 @@ resource "azurerm_virtual_machine" "controllers" {
 
   # boot
   storage_image_reference {
-    id = "${data.azurerm_image.custom.id}"
+    publisher = "CoreOS"
+    offer     = "CoreOS"
+    sku       = "${local.channel}"
+    version   = "latest"
   }
 
   # storage
