@@ -151,3 +151,8 @@ variable "enable_aggregation" {
   type        = "string"
   default     = "false"
 }
+
+variable "kube_version" {
+  description = "Specify Kuberentes version. e.g v1.14.3"
+  default     = "v1.14.3"
+}

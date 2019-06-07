@@ -20,4 +20,15 @@ module "bootkube" {
   cluster_domain_suffix = "${var.cluster_domain_suffix}"
   enable_reporting      = "${var.enable_reporting}"
   enable_aggregation    = "${var.enable_aggregation}"
+
+  container_images = {
+    calico           = "quay.io/calico/node:v3.7.3"
+    calico_cni       = "quay.io/calico/cni:v3.7.3"
+    flannel          = "quay.io/coreos/flannel:v0.11.0-amd64"
+    flannel_cni      = "quay.io/coreos/flannel-cni:v0.3.0"
+    kube_router      = "cloudnativelabs/kube-router:v0.3.1"
+    hyperkube        = "k8s.gcr.io/hyperkube:${var.kube_version}"
+    coredns          = "k8s.gcr.io/coredns:1.5.0"
+    pod_checkpointer = "quay.io/coreos/pod-checkpointer:83e25e5968391b9eb342042c435d1b3eeddb2be1"
+  }
 }
