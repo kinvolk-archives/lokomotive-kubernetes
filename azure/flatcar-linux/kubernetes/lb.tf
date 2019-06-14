@@ -133,9 +133,8 @@ resource "azurerm_lb_probe" "ingress" {
 
   name            = "ingress"
   loadbalancer_id = "${azurerm_lb.cluster.id}"
-  protocol        = "Http"
-  port            = 8002
-  request_path    = "/healthz"
+  protocol        = "Tcp"
+  port            = 30080
 
   # unhealthy threshold
   number_of_probes = 3
