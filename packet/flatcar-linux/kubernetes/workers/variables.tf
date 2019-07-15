@@ -80,7 +80,7 @@ variable "cluster_domain_suffix" {
 
 variable "kubeconfig" {
   description = "Kubeconfig file"
-  type        = "string"
+  type        = "map"
 }
 
 variable "ssh_keys" {

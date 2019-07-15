@@ -36,10 +36,17 @@ resource "aws_route53_record" "apiservers_private" {
   records = ["${packet_device.controllers.*.access_private_ipv4}"]
 }
 
+resource "null_resource" "controller" {
+  count = "${var.controller_count}"
+
+  triggers {
+    hostname = "${var.cluster_name}-controller-${count.index}"
+  }
+}
 
 resource "packet_device" "controllers" {
   count            = "${var.controller_count}"
-  hostname         = "${var.cluster_name}-controller-${count.index}"
+  hostname         = "${element(null_resource.controller.*.triggers.hostname,count.index)}"
   plan             = "${var.controller_type}"
   facilities       = ["${var.facility}"]
   operating_system = "custom_ipxe"
@@ -74,6 +81,11 @@ data "ct_config" "controller-ignitions" {
   content  = "${element(data.template_file.controller-configs.*.rendered, count.index)}"
 }
 
+locals {
+  controller_hostnames = "${null_resource.controller.*.triggers.hostname}"
+  node_names           = "${concat(local.controller_hostnames, var.worker_nodes_hostnames)}"
+}
+
 data "template_file" "controller-configs" {
   count    = "${var.controller_count}"
   template = "${file("${path.module}/cl/controller.yaml.tmpl")}"
@@ -86,7 +98,7 @@ data "template_file" "controller-configs" {
     # etcd0=https://cluster-etcd0.example.com,etcd1=https://cluster-etcd1.example.com,...
     etcd_initial_cluster = "${join(",", data.template_file.etcds.*.rendered)}"
 
-    kubeconfig            = "${indent(10, module.bootkube.kubeconfig-kubelet)}"
+    kubeconfig            = "${indent(10, lookup(module.bootkube.kubeconfig-kubelet, local.controller_hostnames[count.index]))}"
     ssh_keys              = "${jsonencode("${var.ssh_keys}")}"
     k8s_dns_service_ip    = "${cidrhost(var.service_cidr, 10)}"
     cluster_domain_suffix = "${var.cluster_domain_suffix}"

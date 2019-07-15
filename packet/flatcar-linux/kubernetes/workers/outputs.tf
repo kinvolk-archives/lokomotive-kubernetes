@@ -1,5 +1,5 @@
 output "worker_nodes_hostname" {
-  value = "${packet_device.nodes.*.hostname}"
+  value = "${null_resource.worker.*.triggers.hostname}"
 }
 
 output "worker_nodes_public_ipv4" {

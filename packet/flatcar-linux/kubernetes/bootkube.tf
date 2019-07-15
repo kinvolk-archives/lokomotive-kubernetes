@@ -7,6 +7,8 @@ module "bootkube" {
   api_servers          = ["${format("%s-private.%s", var.cluster_name, var.dns_zone)}"]
   api_servers_external = ["${format("%s.%s", var.cluster_name, var.dns_zone)}"]
   etcd_servers         = "${aws_route53_record.etcds.*.name}"
+  node_names           = "${local.node_names}"
+  node_count           = "${var.worker_count+var.controller_count}"
   asset_dir            = "${var.asset_dir}"
   networking           = "${var.networking}"
   network_mtu          = "${var.network_mtu}"
