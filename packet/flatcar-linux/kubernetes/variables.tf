@@ -127,3 +127,52 @@ variable "enable_aggregation" {
   type        = "string"
   default     = "false"
 }
+
+variable "worker_user_data" {
+  description = "User data of the worker"
+  type        = "string"
+  default     = ""
+}
+
+variable "auth_token" {
+  description = "Packet auth token"
+  default     = ""
+  type        = "string"
+}
+
+variable "worker_type" {
+  description = "Packet instance type for workers"
+  default     = "baremetal_0"
+  type        = "string"
+}
+
+variable "worker_os_channel" {
+  description = "Flatcar Linux channel to install from (stable, beta, alpha, edge) on workers"
+  default     = "stable"
+  type        = "string"
+}
+
+variable "enable_autoscaler" {
+  description = "Enable cluster autoscaler (defaults to false)"
+  default     = "false"
+  type        = "string"
+}
+
+variable "pool_name" {
+  description = "Worker pool name"
+  default     = ""
+  type        = "string"
+}
+
+
+variable "min_workers" {
+  description = "Minimum number of workers for the autoscaler"
+  default     = "1"
+  type        = "string"
+}
+
+variable "max_workers" {
+  description = "Maximum number of workers for the autoscaler"
+  default     = "1"
+  type        = "string"
+}

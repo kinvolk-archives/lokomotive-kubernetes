@@ -67,6 +67,7 @@ resource "null_resource" "bootkube-start" {
     "module.bootkube",
     "aws_route53_record.apiservers",
     "null_resource.copy-controller-secrets",
+    "null_resource.autoscaler-config",
   ]
 
   connection {
@@ -76,8 +77,14 @@ resource "null_resource" "bootkube-start" {
     timeout = "15m"
   }
 
+  provisioner "remote-exec" {
+    inline = [
+      "mkdir -p $HOME/assets/manifests-networking",
+    ]
+  }
+
   provisioner "file" {
-    source      = "${var.asset_dir}"
+    source      = "${var.asset_dir}/"
     destination = "$HOME/assets"
   }
 
@@ -91,6 +98,68 @@ resource "null_resource" "bootkube-start" {
       "sudo mv $HOME/assets /opt/bootkube",
       "sudo systemctl start bootkube",
     ]
+  }
+}
+
+resource "null_resource" "autoscaler-config" {
+  count = "${var.enable_autoscaler == "true" ? 1 : 0}"
+
+  depends_on = [
+    "module.bootkube",
+    "aws_route53_record.apiservers",
+    "null_resource.copy-controller-secrets",
+  ]
+
+  connection {
+    type    = "ssh"
+    host    = "${packet_device.controllers.0.access_public_ipv4}"
+    user    = "core"
+    timeout = "15m"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "mkdir -p $HOME/assets/manifests-autoscaling",
+    ]
+  }
+
+  provisioner "file" {
+    content = "${data.template_file.autoscaler_deployment.rendered}"
+    destination = "$HOME/assets/manifests-autoscaling/cluster-autoscaler-deployment.yaml"
+  }
+
+  provisioner "file" {
+    content = "${data.template_file.autoscaler_secret.rendered}"
+    destination = "$HOME/assets/manifests-autoscaling/cluster-autoscaler-secret.yaml"
+  }
+
+  provisioner "file" {
+    source = "${path.module}/autoscaler/cluster-autoscaler-svcaccount.yaml"
+    destination = "$HOME/assets/manifests-autoscaling/cluster-autoscaler-svcaccount.yaml"
+  }
+}
+
+data "template_file" "autoscaler_deployment" {
+  template = "${file("${path.module}/autoscaler/cluster-autoscaler-deployment.yaml.tmpl")}"
+
+  vars {
+    cluster_name = "${var.cluster_name}"
+    min_workers  = "${var.min_workers}"
+    max_workers  = "${var.max_workers}"
+    pool_name    = "${var.pool_name}"
+  }
+}
+
+data "template_file" "autoscaler_secret" {
+  template = "${file("${path.module}/autoscaler/cluster-autoscaler-secret.yaml.tmpl")}"
+
+  vars {
+    facility = "${var.facility}"
+    os_channel = "${var.worker_os_channel}"
+    type = "${var.worker_type}"
+    user_data = "${base64encode(var.worker_user_data)}"
+    packet_auth_token = "${base64encode(var.auth_token)}"
+    project_id = "${packet_device.controllers.project_id}"
   }
 }
 

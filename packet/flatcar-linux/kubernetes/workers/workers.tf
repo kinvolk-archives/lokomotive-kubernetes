@@ -8,6 +8,9 @@ resource "packet_device" "nodes" {
   project_id       = "${var.project_id}"
   user_data        = "${data.ct_config.ignitions.rendered}"
 
+  # for the autoscaler, the pool is hardcoded since we only support one
+  tags             = ["k8s-cluster-${var.cluster_name}", "k8s-nodepool-${var.pool_name}"]
+
   # If not present in the map, it uses ${var.reservation_ids_default}
   hardware_reservation_id = "${lookup(var.reservation_ids, format("worker-%v", count.index), var.reservation_ids_default)}"
 }
@@ -35,3 +38,4 @@ data "template_file" "configs" {
     taints                = "${var.taints}"
   }
 }
+
