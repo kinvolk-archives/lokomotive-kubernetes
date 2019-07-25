@@ -13,7 +13,7 @@ module "bootkube" {
 
   # Select private Packet NIC by using the can-reach Calico autodetection option with the first
   # host in our private CIDR.
-  network_ip_autodetection_method = "can-reach=${cidrhost(var.node_private_cidr, 1)}"
+  network_ip_autodetection_method = "can-reach=${cidrhost(data.packet_precreated_ip_block.project_ip_block.cidr_notation, 1)}"
 
   pod_cidr              = "${var.pod_cidr}"
   service_cidr          = "${var.service_cidr}"

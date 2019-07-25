@@ -119,7 +119,7 @@ data "template_file" "host_protection_policy" {
     controller_host_endpoints = "${join("\n", data.template_file.controller_host_endpoints.*.rendered)}"
     worker_host_endpoints     = "${join("\n", data.template_file.worker_host_endpoints.*.rendered)}"
     management_cidrs          = "${jsonencode("${var.management_cidrs}")}"
-    cluster_internal_cidrs    = "${jsonencode(list("${var.node_private_cidr}", "${var.pod_cidr}", "${var.service_cidr}"))}"
+    cluster_internal_cidrs    = "${jsonencode(list("${data.packet_precreated_ip_block.project_ip_block.cidr_notation}", "${var.pod_cidr}", "${var.service_cidr}"))}"
     etcd_server_cidrs         = "${jsonencode("${packet_device.controllers.*.access_private_ipv4}")}"
   }
 }

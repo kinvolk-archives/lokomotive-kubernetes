@@ -136,11 +136,6 @@ variable "management_cidrs" {
   type        = "list"
 }
 
-variable "node_private_cidr" {
-  description = "Private IPv4 CIDR of the nodes used to allow inter-node traffic"
-  type        = "string"
-}
-
 variable "enable_aggregation" {
   description = "Enable the Kubernetes Aggregation Layer (defaults to false)"
   type        = "string"

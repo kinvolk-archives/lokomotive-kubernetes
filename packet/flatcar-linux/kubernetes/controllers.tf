@@ -103,3 +103,11 @@ data "template_file" "etcds" {
     dns_zone     = "${var.dns_zone}"
   }
 }
+
+# Node private CIDR in this project
+data "packet_precreated_ip_block" "project_ip_block" {
+  facility       = "${var.facility}"
+  project_id     = "${var.project_id}"
+  address_family = 4
+  public         = false
+}

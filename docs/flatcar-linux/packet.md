@@ -151,9 +151,6 @@ module "controller" {
   management_cidrs = [
     "0.0.0.0/0",       # Instances can be SSH-ed into from anywhere on the internet.
   ]
-
-  # This is different for each project on Packet and depends on the packet facility/region. Check yours from the `IPs & Networks` tab from your Packet.net account. If an IP block is not allocated yet, try provisioning an instance from the console in that region. Packet will allocate a public IP CIDR.
-  node_private_cidr = "10.128.156.0/25"
 }
 
 module "worker-pool-helium" {
@@ -264,7 +261,6 @@ Check the [variables.tf](https://github.com/kinvolk/lokomotive-kubernetes/blob/m
 | worker_count | Total number of workers across all worker pools | 2 |
 | worker_nodes_hostnames | List of hostnames of all worker nodes | ["foo-pool1-worker-0", "foo-pool1-worker-1"]
 | management_cidrs | List of CIDRs to allow SSH access to the nodes | ["153.79.80.1/16", "59.60.10.1/32"] |
-| node_private_cidr | Private CIDR obtained from Packet for the project and facility | 10.128.16.32/25 |
 
 #### Worker module
 
