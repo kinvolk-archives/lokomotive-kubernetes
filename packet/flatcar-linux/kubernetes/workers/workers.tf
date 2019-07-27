@@ -1,5 +1,5 @@
 resource "packet_device" "nodes" {
-  count            = "${var.count}"
+  count            = "${var.worker_count}"
   hostname         = "${var.cluster_name}-${var.pool_name}-worker-${count.index}"
   plan             = "${var.type}"
   facilities       = ["${var.facility}"]
@@ -36,7 +36,7 @@ data "template_file" "install" {
 }
 
 resource "packet_bgp_session" "bgp" {
-  count          = "${var.count}"
+  count          = "${var.worker_count}"
   device_id      = "${element(packet_device.nodes.*.id, count.index)}"
   address_family = "ipv4"
 }
