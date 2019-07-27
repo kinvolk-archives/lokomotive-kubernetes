@@ -1,14 +1,14 @@
 resource "packet_device" "nodes" {
-  count            = "${var.worker_count}"
+  count            = var.worker_count
   hostname         = "${var.cluster_name}-${var.pool_name}-worker-${count.index}"
-  plan             = "${var.type}"
-  facilities       = ["${var.facility}"]
+  plan             = var.type
+  facilities       = [var.facility]
   operating_system = "custom_ipxe"
   billing_cycle    = "hourly"
-  project_id       = "${var.project_id}"
-  ipxe_script_url  = "${var.ipxe_script_url}"
+  project_id       = var.project_id
+  ipxe_script_url  = var.ipxe_script_url
   always_pxe       = "false"
-  user_data        = "${data.ct_config.install-ignitions.rendered}"
+  user_data        = data.ct_config.install-ignitions.rendered
 
   # If not present in the map, it uses ${var.reservation_ids_default}.
   hardware_reservation_id = "${lookup(var.reservation_ids, format("worker-%v", count.index), var.reservation_ids_default)}"
@@ -16,15 +16,15 @@ resource "packet_device" "nodes" {
 
 # These configs are used for the fist boot, to run flatcar-install
 data "ct_config" "install-ignitions" {
-  content = "${data.template_file.install.rendered}"
+  content = data.template_file.install.rendered
 }
 
 data "template_file" "install" {
-  template = "${file("${path.module}/cl/install.yaml.tmpl")}"
+  template = file("${path.module}/cl/install.yaml.tmpl")
 
-  vars {
-    os_channel           = "${var.os_channel}"
-    os_version           = "${var.os_version}"
+  vars = {
+    os_channel           = var.os_channel
+    os_version           = var.os_version
     flatcar_linux_oem    = "packet"
     ssh_keys             = "${jsonencode("${var.ssh_keys}")}"
     postinstall_ignition = "${data.ct_config.ignitions.rendered}"
@@ -36,25 +36,26 @@ data "template_file" "install" {
 }
 
 resource "packet_bgp_session" "bgp" {
-  count          = "${var.worker_count}"
-  device_id      = "${element(packet_device.nodes.*.id, count.index)}"
+  count          = var.worker_count
+  device_id      = element(packet_device.nodes.*.id, count.index)
   address_family = "ipv4"
 }
 
 data "ct_config" "ignitions" {
-  content  = "${data.template_file.configs.rendered}"
+  content  = data.template_file.configs.rendered
   platform = "packet"
 }
 
 data "template_file" "configs" {
-  template = "${file("${path.module}/cl/worker.yaml.tmpl")}"
+  template = file("${path.module}/cl/worker.yaml.tmpl")
 
-  vars {
-    kubeconfig            = "${indent(10, "${var.kubeconfig}")}"
-    ssh_keys              = "${jsonencode("${var.ssh_keys}")}"
-    k8s_dns_service_ip    = "${cidrhost(var.service_cidr, 10)}"
-    cluster_domain_suffix = "${var.cluster_domain_suffix}"
-    worker_labels         = "${var.labels}"
-    taints                = "${var.taints}"
+  vars = {
+    kubeconfig            = indent(10, var.kubeconfig)
+    ssh_keys              = jsonencode(var.ssh_keys)
+    k8s_dns_service_ip    = cidrhost(var.service_cidr, 10)
+    cluster_domain_suffix = var.cluster_domain_suffix
+    worker_labels         = var.labels
+    taints                = var.taints
   }
 }
+

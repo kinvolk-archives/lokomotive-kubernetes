@@ -1,17 +1,17 @@
 # DNS records
 
 variable "cluster_name" {
-  type        = "string"
+  type        = string
   description = "Unique cluster name (prepended to dns_zone)"
 }
 
 variable "dns_zone" {
-  type        = "string"
+  type        = string
   description = "AWS Route53 DNS Zone (e.g. aws.example.com)"
 }
 
 variable "dns_zone_id" {
-  type        = "string"
+  type        = string
   description = "AWS Route53 DNS Zone ID (e.g. Z3PAABBCFAKEC0)"
 }
 
@@ -22,41 +22,41 @@ variable "project_id" {
 # Nodes
 
 variable "os_channel" {
-  type        = "string"
+  type        = string
   default     = "stable"
   description = "Flatcar Linux channel to install from (stable, beta, alpha)"
 }
 
 variable "os_version" {
-  type        = "string"
+  type        = string
   default     = "current"
   description = "Flatcar Linux version to install (for example '2079.3.1' - see https://www.flatcar-linux.org/releases/)"
 }
 
 variable "controller_count" {
-  type        = "string"
+  type        = string
   default     = "1"
   description = "Number of controllers (i.e. masters)"
 }
 
 variable "worker_count" {
-  type        = "string"
+  type        = string
   description = "Number of workers"
 }
 
 variable "worker_nodes_hostnames" {
-  type        = "list"
+  type        = list(string)
   description = "List of hostname of packet_device resources"
 }
 
 variable "controller_type" {
-  type        = "string"
+  type        = string
   default     = "baremetal_0"
   description = "Packet instance type for controllers"
 }
 
 variable "ipxe_script_url" {
-  type = "string"
+  type = string
 
   # Workaround. iPXE-booting Flatcar on Packet over HTTPS is failing due to a bug in iPXE.
   # This patch is supposed to fix this: http://git.ipxe.org/ipxe.git/commitdiff/b6ffe28a2
@@ -69,43 +69,43 @@ variable "ipxe_script_url" {
 }
 
 variable "facility" {
-  type        = "string"
+  type        = string
   description = "Packet facility to deploy the cluster in"
 }
 
 # Configuration
 
 variable "ssh_keys" {
-  type        = "list"
+  type        = list(string)
   description = "SSH public keys for user 'core'"
 }
 
 variable "asset_dir" {
   description = "Path to a directory where generated assets should be placed (contains secrets)"
-  type        = "string"
+  type        = string
 }
 
 variable "networking" {
   description = "Choice of networking provider (flannel or calico)"
-  type        = "string"
+  type        = string
   default     = "calico"
 }
 
 variable "network_mtu" {
   description = "CNI interface MTU (applies to calico only)"
-  type        = "string"
+  type        = string
   default     = "1480"
 }
 
 variable "network_ip_autodetection_method" {
   description = "Method to autodetect the host IPv4 address (applies to calico only)"
-  type        = "string"
+  type        = string
   default     = "first-found"
 }
 
 variable "pod_cidr" {
   description = "CIDR IPv4 range to assign Kubernetes pods"
-  type        = "string"
+  type        = string
   default     = "10.2.0.0/16"
 }
 
@@ -115,34 +115,36 @@ CIDR IPv4 range to assign Kubernetes services.
 The 1st IP will be reserved for kube_apiserver, the 10th IP will be reserved for coredns.
 EOD
 
-  type    = "string"
+
+  type = string
   default = "10.3.0.0/16"
 }
 
 variable "cluster_domain_suffix" {
   description = "Queries for domains with the suffix will be answered by coredns. Default is cluster.local (e.g. foo.default.svc.cluster.local) "
-  type        = "string"
-  default     = "cluster.local"
+  type = string
+  default = "cluster.local"
 }
 
 variable "enable_reporting" {
-  type        = "string"
+  type = string
   description = "Enable usage or analytics reporting to upstreams (Calico)"
-  default     = "false"
+  default = "false"
 }
 
 variable "management_cidrs" {
   description = "List of IPv4 CIDRs authorized to access or manage the cluster"
-  type        = "list"
+  type = list(string)
 }
 
 variable "node_private_cidr" {
   description = "Private IPv4 CIDR of the nodes used to allow inter-node traffic"
-  type        = "string"
+  type = string
 }
 
 variable "enable_aggregation" {
   description = "Enable the Kubernetes Aggregation Layer (defaults to false)"
-  type        = "string"
-  default     = "false"
+  type = string
+  default = "false"
 }
+
