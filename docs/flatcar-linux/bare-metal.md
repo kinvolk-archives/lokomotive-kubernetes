@@ -144,9 +144,9 @@ Configure the Matchbox provider to use your Matchbox API endpoint and client cer
 provider "matchbox" {
   version     = "0.3.0"
   endpoint    = "matchbox.example.com:8081"
-  client_cert = "${file("~/.config/matchbox/client.crt")}"
-  client_key  = "${file("~/.config/matchbox/client.key")}"
-  ca          = "${file("~/.config/matchbox/ca.crt")}"
+  client_cert = file("~/.config/matchbox/client.crt")
+  client_key  = file("~/.config/matchbox/client.key")
+  ca          = file("~/.config/matchbox/ca.crt")
 }
 
 provider "ct" {
@@ -183,10 +183,10 @@ module "bare-metal-mercury" {
   source = "git::https://github.com/kinvolk/lokomotive-kubernetes//bare-metal/flatcar-linux/kubernetes?ref=<hash>"
   
   providers = {
-    local = "local.default"
-    null = "null.default"
-    template = "template.default"
-    tls = "tls.default"
+    local = local.default
+    null = null.default
+    template = template.default
+    tls = tls.default
   }
   
   # bare-metal

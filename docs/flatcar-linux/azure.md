@@ -90,11 +90,11 @@ module "azure-ramius" {
   source = "git::https://github.com/kinvolk/lokomotive-kubernetes//azure/flatcar-linux/kubernetes"
 
   providers = {
-    azurerm  = "azurerm.default"
-    local    = "local.default"
-    null     = "null.default"
-    template = "template.default"
-    tls      = "tls.default"
+    azurerm  = azurerm.default
+    local    = local.default
+    null     = null.default
+    template = template.default
+    tls      = tls.default
   }
 
   # Azure
