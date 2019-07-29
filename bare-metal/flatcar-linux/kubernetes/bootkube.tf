@@ -4,7 +4,7 @@ module "bootkube" {
 
   cluster_name                    = var.cluster_name
   api_servers                     = [var.k8s_domain_name]
-  etcd_servers                    = [var.controller_domains]
+  etcd_servers                    = var.controller_domains
   asset_dir                       = var.asset_dir
   networking                      = var.networking
   network_mtu                     = var.network_mtu
@@ -15,4 +15,3 @@ module "bootkube" {
   enable_reporting                = var.enable_reporting
   enable_aggregation              = var.enable_aggregation
 }
-

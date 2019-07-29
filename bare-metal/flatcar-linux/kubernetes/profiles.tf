@@ -21,14 +21,14 @@ resource "matchbox_profile" "container-linux-install" {
     "${var.download_protocol}://${local.channel}.release.core-os.net/amd64-usr/${var.os_version}/coreos_production_pxe_image.cpio.gz",
   ]
 
-  args = [
+  args = flatten([
     "initrd=coreos_production_pxe_image.cpio.gz",
     "coreos.config.url=${var.matchbox_http_endpoint}/ignition?uuid=$${uuid}&mac=$${mac:hexhyp}",
     "coreos.first_boot=yes",
     "console=tty0",
     "console=ttyS0",
     var.kernel_args,
-  ]
+  ])
 
   container_linux_config = element(
     data.template_file.container-linux-install-configs.*.rendered,
@@ -70,14 +70,14 @@ resource "matchbox_profile" "cached-container-linux-install" {
     "/assets/coreos/${var.os_version}/coreos_production_pxe_image.cpio.gz",
   ]
 
-  args = [
+  args = flatten([
     "initrd=coreos_production_pxe_image.cpio.gz",
     "coreos.config.url=${var.matchbox_http_endpoint}/ignition?uuid=$${uuid}&mac=$${mac:hexhyp}",
     "coreos.first_boot=yes",
     "console=tty0",
     "console=ttyS0",
     var.kernel_args,
-  ]
+  ])
 
   container_linux_config = element(
     data.template_file.cached-container-linux-install-configs.*.rendered,
@@ -118,14 +118,14 @@ resource "matchbox_profile" "flatcar-install" {
     "${var.download_protocol}://${local.channel}.release.flatcar-linux.net/amd64-usr/${var.os_version}/flatcar_production_pxe_image.cpio.gz",
   ]
 
-  args = [
+  args = flatten([
     "initrd=flatcar_production_pxe_image.cpio.gz",
     "flatcar.config.url=${var.matchbox_http_endpoint}/ignition?uuid=$${uuid}&mac=$${mac:hexhyp}",
     "flatcar.first_boot=yes",
     "console=tty0",
     "console=ttyS0",
     var.kernel_args,
-  ]
+  ])
 
   container_linux_config = element(
     data.template_file.container-linux-install-configs.*.rendered,
@@ -149,14 +149,14 @@ resource "matchbox_profile" "cached-flatcar-linux-install" {
     "/assets/flatcar/${var.os_version}/flatcar_production_pxe_image.cpio.gz",
   ]
 
-  args = [
+  args = flatten([
     "initrd=flatcar_production_pxe_image.cpio.gz",
     "flatcar.config.url=${var.matchbox_http_endpoint}/ignition?uuid=$${uuid}&mac=$${mac:hexhyp}",
     "flatcar.first_boot=yes",
     "console=tty0",
     "console=ttyS0",
     var.kernel_args,
-  ]
+  ])
 
   container_linux_config = element(
     data.template_file.cached-container-linux-install-configs.*.rendered,
@@ -192,7 +192,7 @@ data "ct_config" "controller-ignitions" {
   # If the expression in the following list itself returns a list, remove the
   # brackets to avoid interpretation as a list of lists. If the expression
   # returns a single list item then leave it as-is and remove this TODO comment.
-  snippets = [local.clc_map[element(var.controller_names, count.index)]]
+  snippets = local.clc_map[element(var.controller_names, count.index)]
 }
 
 data "template_file" "controller-configs" {
@@ -242,7 +242,7 @@ data "ct_config" "worker-ignitions" {
   # If the expression in the following list itself returns a list, remove the
   # brackets to avoid interpretation as a list of lists. If the expression
   # returns a single list item then leave it as-is and remove this TODO comment.
-  snippets = [local.clc_map[element(var.worker_names, count.index)]]
+  snippets = local.clc_map[element(var.worker_names, count.index)]
 }
 
 data "template_file" "worker-configs" {
