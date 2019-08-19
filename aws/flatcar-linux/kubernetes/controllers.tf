@@ -13,12 +13,62 @@ resource "aws_route53_record" "etcds" {
   records = ["${element(aws_instance.controllers.*.private_ip, count.index)}"]
 }
 
+resource "aws_iam_role" "controllers" {
+  name = "${var.cluster_name}-controllers"
+
+  assume_role_policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": "sts:AssumeRole",
+            "Principal": {
+               "Service": "ec2.amazonaws.com"
+            },
+            "Effect": "Allow",
+            "Sid": ""
+        }
+    ]
+}
+EOF
+}
+
+resource "aws_iam_instance_profile" "controllers" {
+  name = "${var.cluster_name}-controllers"
+  role = "${aws_iam_role.controllers.name}"
+}
+
+resource "aws_iam_role_policy" "controllers" {
+  name = "controllers"
+  role = "${aws_iam_role.controllers.id}"
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "ec2:CreateVolume",
+        "ec2:DeleteVolume",
+        "ec2:AttachVolume",
+        "ec2:DetachVolume",
+        "ec2:DescribeInstances"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    }
+  ]
+}
+EOF
+}
+
 # Controller instances
 resource "aws_instance" "controllers" {
   count = "${var.controller_count}"
 
   tags = {
     Name = "${var.cluster_name}-controller-${count.index}"
+    "kubernetes.io/cluster/${var.cluster_name}" = "owned"
   }
 
   instance_type = "${var.controller_type}"
@@ -37,6 +87,8 @@ resource "aws_instance" "controllers" {
   associate_public_ip_address = true
   subnet_id                   = "${element(aws_subnet.public.*.id, count.index)}"
   vpc_security_group_ids      = ["${aws_security_group.controller.id}"]
+
+  iam_instance_profile = "${aws_iam_instance_profile.controllers.name}"
 
   lifecycle {
     ignore_changes = [

@@ -8,7 +8,10 @@ resource "aws_vpc" "network" {
   enable_dns_support               = true
   enable_dns_hostnames             = true
 
-  tags = "${map("Name", "${var.cluster_name}")}"
+  tags = "${map(
+    "Name", "${var.cluster_name}",
+    "kubernetes.io/cluster/${var.cluster_name}", "owned"
+  )}"
 }
 
 resource "aws_internet_gateway" "gateway" {
@@ -46,7 +49,10 @@ resource "aws_subnet" "public" {
   map_public_ip_on_launch         = true
   assign_ipv6_address_on_creation = true
 
-  tags = "${map("Name", "${var.cluster_name}-public-${count.index}")}"
+  tags = "${map(
+    "Name", "${var.cluster_name}-public-${count.index}",
+    "kubernetes.io/cluster/${var.cluster_name}", "owned",
+  )}"
 }
 
 resource "aws_route_table_association" "public" {
