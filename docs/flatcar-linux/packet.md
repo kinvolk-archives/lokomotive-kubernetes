@@ -176,7 +176,7 @@ module "worker-pool-helium" {
   facility     = "ams1"
   pool_name    = "helium"
 
-  count = 2
+  worker_count = 2
   type  = "t1.small.x86"
 
   ipxe_script_url = "https://raw.githubusercontent.com/kinvolk/flatcar-ipxe-scripts/no-https/packet.ipxe"
@@ -317,7 +317,7 @@ Reference the DNS zone id with `"${aws_route53_zone.zone-for-clusters.zone_id}"`
 
 | Name | Description | Default | Example |
 |:-----|:------------|:--------|:--------|
-| count | Number of worker nodes | 1 | 3 |
+| worker_count | Number of worker nodes | 1 | 3 |
 | type | Type of nodes to provision | "baremetal_0" | "t1.small.x86". See https://www.packet.com/developers/api/#plans for more |
 | labels | Comma separated labels to be added to the worker nodes | "" | "node.supernova.io/role=backend" |
 | ipxe_script_url | URL that contains iPXE script to boot Flatcar on the node over PXE | https://raw.githubusercontent.com/kinvolk/flatcar-ipxe-scripts/no-https/packet.ipxe | https://scripts.foobar.com/ipxe-flatcar.ipxe |
