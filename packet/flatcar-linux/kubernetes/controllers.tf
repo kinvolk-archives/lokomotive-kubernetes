@@ -10,7 +10,7 @@ resource "aws_route53_record" "etcds" {
   ttl  = 300
 
   # private IPv4 address for etcd
-  records = [element(packet_device.controllers.*.access_private_ipv4, count.index)]
+  records = [packet_device.controllers[count.index].access_private_ipv4]
 }
 
 # DNS record for the API servers
@@ -46,18 +46,12 @@ resource "packet_device" "controllers" {
   project_id       = var.project_id
   ipxe_script_url  = var.ipxe_script_url
   always_pxe       = "false"
-  user_data = element(
-    data.ct_config.controller-install-ignitions.*.rendered,
-    count.index,
-  )
+  user_data = data.ct_config.controller-install-ignitions[count.index].rendered
 }
 
 data "ct_config" "controller-install-ignitions" {
   count = var.controller_count
-  content = element(
-    data.template_file.controller-install.*.rendered,
-    count.index,
-  )
+  content = data.template_file.controller-install[count.index].rendered
 }
 
 data "template_file" "controller-install" {
@@ -69,17 +63,14 @@ data "template_file" "controller-install" {
     os_version           = var.os_version
     flatcar_linux_oem    = "packet"
     ssh_keys             = jsonencode(var.ssh_keys)
-    postinstall_ignition = element(data.ct_config.controller-ignitions.*.rendered, count.index)
+    postinstall_ignition = data.ct_config.controller-ignitions[count.index].rendered
   }
 }
 
 data "ct_config" "controller-ignitions" {
   count    = var.controller_count
   platform = "packet"
-  content = element(
-    data.template_file.controller-configs.*.rendered,
-    count.index,
-  )
+  content = data.template_file.controller-configs[count.index].rendered
 }
 
 data "template_file" "controller-configs" {

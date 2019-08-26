@@ -11,16 +11,13 @@ resource "azurerm_dns_a_record" "etcds" {
   ttl  = 300
 
   # private IPv4 address for etcd
-  records = [element(
-    azurerm_network_interface.controllers.*.private_ip_address,
-    count.index,
-  )]
+  records = [azurerm_network_interface.controllers[count.index].private_ip_address]
 }
 
 locals {
   # Channel for a Container Linux derivative
   # coreos-stable -> Container Linux Stable
-  channel = element(split("-", var.os_image), 1)
+  channel = split("-", var.os_image)[1]
 }
 
 # Controller availability set to spread controllers
@@ -65,12 +62,12 @@ resource "azurerm_virtual_machine" "controllers" {
   }
 
   # network
-  network_interface_ids = [element(azurerm_network_interface.controllers.*.id, count.index)]
+  network_interface_ids = [azurerm_network_interface.controllers[count.index].id]
 
   os_profile {
     computer_name  = "${var.cluster_name}-controller-${count.index}"
     admin_username = "core"
-    custom_data    = element(data.ct_config.controller-ignitions.*.rendered, count.index)
+    custom_data    = data.ct_config.controller-ignitions[count.index].rendered
   }
 
   # Azure mandates setting an ssh_key, even though Ignition custom_data handles it too
@@ -110,7 +107,7 @@ resource "azurerm_network_interface" "controllers" {
     private_ip_address_allocation = "dynamic"
 
     # public IPv4
-    public_ip_address_id = element(azurerm_public_ip.controllers.*.id, count.index)
+    public_ip_address_id = azurerm_public_ip.controllers[count.index].id
   }
 }
 
@@ -135,10 +132,7 @@ resource "azurerm_public_ip" "controllers" {
 # Controller Ignition configs
 data "ct_config" "controller-ignitions" {
   count = var.controller_count
-  content = element(
-    data.template_file.controller-configs.*.rendered,
-    count.index,
-  )
+  content = data.template_file.controller-configs[count.index].rendered
   pretty_print = false
   snippets     = var.controller_clc_snippets
 }

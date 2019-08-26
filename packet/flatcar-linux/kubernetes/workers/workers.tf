@@ -37,7 +37,7 @@ data "template_file" "install" {
 
 resource "packet_bgp_session" "bgp" {
   count          = var.worker_count
-  device_id      = element(packet_device.nodes.*.id, count.index)
+  device_id      = packet_device.nodes[count.index].id
   address_family = "ipv4"
 }
 

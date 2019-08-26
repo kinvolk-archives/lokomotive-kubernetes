@@ -1,7 +1,7 @@
 locals {
   # Channel for a Container Linux derivative
   # coreos-stable -> Container Linux Stable
-  channel = element(split("-", var.os_image), 1)
+  channel = split("-", var.os_image)[1]
 }
 
 data "azurerm_image" "custom_workers" {
