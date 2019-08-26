@@ -48,8 +48,8 @@ resource "aws_instance" "controllers" {
 
 # Controller Ignition configs
 data "ct_config" "controller-ignitions" {
-  count = var.controller_count
-  content = data.template_file.controller-configs[count.index].rendered
+  count        = var.controller_count
+  content      = data.template_file.controller-configs[count.index].rendered
   pretty_print = false
   snippets     = var.controller_clc_snippets
 }

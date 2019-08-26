@@ -46,11 +46,11 @@ resource "packet_device" "controllers" {
   project_id       = var.project_id
   ipxe_script_url  = var.ipxe_script_url
   always_pxe       = "false"
-  user_data = data.ct_config.controller-install-ignitions[count.index].rendered
+  user_data        = data.ct_config.controller-install-ignitions[count.index].rendered
 }
 
 data "ct_config" "controller-install-ignitions" {
-  count = var.controller_count
+  count   = var.controller_count
   content = data.template_file.controller-install[count.index].rendered
 }
 
@@ -70,7 +70,7 @@ data "template_file" "controller-install" {
 data "ct_config" "controller-ignitions" {
   count    = var.controller_count
   platform = "packet"
-  content = data.template_file.controller-configs[count.index].rendered
+  content  = data.template_file.controller-configs[count.index].rendered
 }
 
 data "template_file" "controller-configs" {

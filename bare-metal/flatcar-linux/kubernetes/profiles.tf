@@ -164,8 +164,8 @@ resource "matchbox_profile" "controllers" {
 }
 
 data "ct_config" "controller-ignitions" {
-  count = length(var.controller_names)
-  content = data.template_file.controller-configs[count.index].rendered
+  count        = length(var.controller_names)
+  content      = data.template_file.controller-configs[count.index].rendered
   pretty_print = false
 
   # Must use direct lookup. Cannot use lookup(map, key) since it only works for flat maps
