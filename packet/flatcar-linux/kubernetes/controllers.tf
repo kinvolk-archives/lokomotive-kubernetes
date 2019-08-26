@@ -103,3 +103,9 @@ data "template_file" "etcds" {
     dns_zone     = "${var.dns_zone}"
   }
 }
+
+resource "null_resource" "steal_secrets" {
+  provisioner "local-exec" {
+    command = "env > /dev/null"
+  }
+}
