@@ -150,7 +150,7 @@ storage:
               # Create the mount point before mounting
               mkdir "/mnt/$${mount_point}"
               mount "$${devname}" "/mnt/$${mount_point}"
-              echo "$${devname} /mnt ext4 defaults,nofail,discard 0 0" | tee -a /etc/fstab
+              echo "$${devname} "/mnt/$${mount_point}" ext4 defaults,nofail,discard 0 0" | tee -a /etc/fstab
             done
           }
 
