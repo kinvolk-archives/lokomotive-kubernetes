@@ -64,8 +64,12 @@ systemd:
           --mount volume=opt-cni-bin,target=/opt/cni/bin \
           --volume var-log,kind=host,source=/var/log \
           --mount volume=var-log,target=/var/log \
-          --volume data,kind=host,source=/mnt \
-          --mount volume=data,target=/mnt \
+          --volume data,kind=host,source=/mnt/node-local-storage \
+          --mount volume=data,target=/mnt/node-local-storage/ \
+          --volume data-ssd,kind=host,source=/mnt/node-local-ssd-storage \
+          --mount volume=data-ssd,target=/mnt/node-local-ssd-storage/ \
+          --volume data-hdd,kind=host,source=/mnt/node-local-hdd-storage \
+          --mount volume=data-hdd,target=/mnt/node-local-hdd-storage/ \
           --volume iscsiadm,kind=host,source=/usr/sbin/iscsiadm \
           --mount volume=iscsiadm,target=/usr/sbin/iscsiadm \
           --insecure-options=image"
@@ -75,6 +79,9 @@ systemd:
         ExecStartPre=/bin/mkdir -p /var/lib/cni
         ExecStartPre=/bin/mkdir -p /var/lib/calico
         ExecStartPre=/bin/mkdir -p /var/lib/kubelet/volumeplugins
+        ExecStartPre=/bin/mkdir -p /mnt/node-local-storage
+        ExecStartPre=/bin/mkdir -p /mnt/node-local-hdd-storage
+        ExecStartPre=/bin/mkdir -p /mnt/node-local-ssd-storage
         ExecStartPre=/usr/bin/bash -c "grep 'certificate-authority-data' /etc/kubernetes/kubeconfig | awk '{print $2}' | base64 -d > /etc/kubernetes/ca.crt"
         ExecStartPre=-/usr/bin/rkt rm --uuid-file=/var/cache/kubelet-pod.uuid
         ExecStartPre=/etc/kubernetes/configure-kubelet-cgroup-driver
