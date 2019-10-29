@@ -109,7 +109,7 @@ module "azure-ramius" {
     "ssh-rsa AAAAB3Nz...",
   ]
 
-  asset_dir          = "/home/user/.secrets/clusters/ramius"
+  asset_dir          = "./assets"
 
   # optional
   worker_count    = 2
@@ -162,7 +162,7 @@ In 4-8 minutes, the Kubernetes cluster will be ready.
 [Install kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) on your system. Use the generated `kubeconfig` credentials to access the Kubernetes cluster and list nodes.
 
 ```
-$ export KUBECONFIG=/home/user/.secrets/clusters/ramius/auth/kubeconfig
+$ export KUBECONFIG=$PWD/assets/auth/kubeconfig
 $ kubectl get nodes
 NAME                  STATUS  ROLES              AGE  VERSION
 ramius-controller-0   Ready   controller,master  24m  v1.14.1
@@ -212,7 +212,7 @@ Check the [variables.tf](https://github.com/kinvolk/lokomotive-kubernetes/blob/m
 | dns_zone | Azure DNS zone | "azure.example.com" |
 | dns_zone_group | Resource group where the Azure DNS zone resides | "global" |
 | ssh_keys | List of SSH public keys for user 'core' | ["ssh-rsa AAAAB3NZ..."] |
-| asset_dir | Path to a directory where generated assets should be placed (contains secrets) | "/home/user/.secrets/clusters/ramius" |
+| asset_dir | Path to a directory where generated assets should be placed (contains secrets) | "./assets" |
 
 !!! tip
     Regions are shown in [docs](https://azure.microsoft.com/en-us/global-infrastructure/regions/) or with `az account list-locations --output table`.

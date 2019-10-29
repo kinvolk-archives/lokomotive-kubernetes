@@ -172,7 +172,7 @@ module "bare-metal-mercury" {
     "ssh-rsa AAAAB3Nz...",
   ]
 
-  asset_dir          = "/home/user/.secrets/clusters/mercury"
+  asset_dir          = "./assets"
 
   # machines
   controller_names   = ["node1"]
@@ -290,7 +290,7 @@ bootkube[5]: Tearing down temporary bootstrap control plane...
 [Install kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) on your system. Use the generated `kubeconfig` credentials to access the Kubernetes cluster and list nodes.
 
 ```
-$ export KUBECONFIG=/home/user/.secrets/clusters/mercury/auth/kubeconfig
+$ export KUBECONFIG=$PWD/assets/auth/kubeconfig
 $ kubectl get nodes
 NAME                STATUS  ROLES              AGE  VERSION
 node1.example.com   Ready   controller,master  10m  v1.14.1
@@ -338,7 +338,7 @@ Check the [variables.tf](https://github.com/kinvolk/lokomotive-kubernetes/blob/m
 | os_version | Version of Flatcar Container Linux to PXE and install | "1632.3.0" |
 | k8s_domain_name | FQDN resolving to the controller(s) nodes. Workers and kubectl will communicate with this endpoint | "myk8s.example.com" |
 | ssh_keys | List of SSH public keys for user 'core' | ["ssh-rsa AAAAB3NZ..."] |
-| asset_dir | Path to a directory where generated assets should be placed (contains secrets) | "/home/user/.secrets/clusters/mercury" |
+| asset_dir | Path to a directory where generated assets should be placed (contains secrets) | "./assets" |
 | controller_names | Ordered list of controller short names | ["node1"] |
 | controller_macs | Ordered list of controller identifying MAC addresses | ["52:54:00:a1:9c:ae"] |
 | controller_domains | Ordered list of controller FQDNs | ["node1.example.com"] |
@@ -362,4 +362,3 @@ Check the [variables.tf](https://github.com/kinvolk/lokomotive-kubernetes/blob/m
 | cluster_domain_suffix | FQDN suffix for Kubernetes services answered by coredns. | "cluster.local" | "k8s.example.com" |
 | kernel_args | Additional kernel args to provide at PXE boot | [] | "kvm-intel.nested=1" |
 | certs_validity_period_hours | Validity of all the certificates in hours | 8760 | 17520 |
-

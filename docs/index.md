@@ -60,7 +60,7 @@ module "google-cloud-yavin" {
     "ssh-rsa AAAAB3Nz...",
   ]
 
-  asset_dir          = "/home/user/.secrets/clusters/yavin"
+  asset_dir          = "./assets"
 
   # optional
   worker_count = 2
@@ -80,7 +80,7 @@ Apply complete! Resources: 64 added, 0 changed, 0 destroyed.
 In 4-8 minutes (varies by platform), the cluster will be ready. This Google Cloud example creates a `yavin.example.com` DNS record to resolve to a network load balancer across controller nodes.
 
 ```
-$ export KUBECONFIG=/home/user/.secrets/clusters/yavin/auth/kubeconfig
+$ export KUBECONFIG=$PWD/assets/auth/kubeconfig
 $ kubectl get nodes
 NAME                                       ROLES              STATUS  AGE  VERSION
 yavin-controller-0.c.example-com.internal  controller,master  Ready   6m   v1.14.1

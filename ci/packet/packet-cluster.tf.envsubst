@@ -5,7 +5,7 @@ module "controller" {
 
   ssh_keys = ["$PUB_KEY"]
 
-  asset_dir = pathexpand("~/assets")
+  asset_dir = "./assets"
   cluster_name = "$CLUSTER_ID"
   project_id = "$PACKET_PROJECT_ID"
 

@@ -80,7 +80,7 @@ module "aws-tempest" {
     "ssh-rsa AAAAB3Nz...",
   ]
 
-  asset_dir          = "/home/user/.secrets/clusters/tempest"
+  asset_dir          = "./assets"
 
   # optional
   worker_count = 2
@@ -133,7 +133,7 @@ In 4-8 minutes, the Kubernetes cluster will be ready.
 [Install kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) on your system. Use the generated `kubeconfig` credentials to access the Kubernetes cluster and list nodes.
 
 ```
-$ export KUBECONFIG=/home/user/.secrets/clusters/tempest/auth/kubeconfig
+$ export KUBECONFIG=$PWD/assets/auth/kubeconfig
 $ kubectl get nodes
 NAME           STATUS  ROLES              AGE  VERSION
 ip-10-0-3-155  Ready   controller,master  10m  v1.14.1
@@ -179,7 +179,7 @@ Check the [variables.tf](https://github.com/kinvolk/lokomotive-kubernetes/blob/m
 | dns_zone | AWS Route53 DNS zone | "aws.example.com" |
 | dns_zone_id | AWS Route53 DNS zone id | "Z3PAABBCFAKEC0" |
 | ssh_keys | List of SSH public keys for user 'core' | ["ssh-rsa AAAAB3NZ..."] |
-| asset_dir | Path to a directory where generated assets should be placed (contains secrets, used to destroy the cluster), cannot be a relative path | "/home/user/.secrets/clusters/tempest" |
+| asset_dir | Path to a directory where generated assets should be placed (contains secrets, used to destroy the cluster). | "./assets" |
 
 #### DNS Zone
 
@@ -235,4 +235,3 @@ Check the list of valid [instance types](https://aws.amazon.com/ec2/instance-typ
 #### Spot
 
 Add `worker_price = "0.10"` to use spot instance workers (instead of "on-demand") and set a maximum spot price in USD. Clusters can tolerate spot market interuptions fairly well (reschedules pods, but cannot drain) to save money, with the tradeoff that requests for workers may go unfulfilled.
-

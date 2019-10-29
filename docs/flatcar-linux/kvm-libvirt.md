@@ -136,7 +136,7 @@ module "controller" {
   ]
 
   # Where you want the terraform assets to be saved for KUBECONFIG
-  asset_dir = "/path/to/clusters/asset"
+  asset_dir = "./assets"
 
   machine_domain = "vmcluster.k8s"
   cluster_name = "vmcluster"
@@ -223,7 +223,7 @@ In 3-6 minutes, the Kubernetes cluster will be ready, depending on your downlink
 Use the generated `kubeconfig` credentials to access the Kubernetes cluster and list nodes.
 
 ```
-$ export KUBECONFIG=/path/to/clusters/asset/auth/kubeconfig  # matching the asset_dir from the config file
+$ export KUBECONFIG=$PWD/assets/auth/kubeconfig  # matching the asset_dir from the config file
 $ kubectl get nodes
 NAME                                   STATUS   ROLES               AGE     VERSION
 vmcluster-controller-0.vmcluster.k8s   Ready    controller,master   5h28m   v1.14.1
@@ -260,7 +260,7 @@ source.
 
 | Name | Description | Example |
 |:-----|:------------|:--------|
-| asset_dir | Path to a directory where generated assets should be placed (contains secrets) | "/home/user/infra/assets" |
+| asset_dir | Path to a directory where generated assets should be placed (contains secrets) | "./assets" |
 | cluster_name | Unique cluster name | "vmcluster" |
 | machine_domain | DNS zone | "vmcluster.k8s" |
 | os_image_unpacked | Path to unpacked Flatcar Container Linux image (probably after a qemu-img resize IMG +5G) | "file:///home/user/infra/flatcar_production_qemu_image.img" |

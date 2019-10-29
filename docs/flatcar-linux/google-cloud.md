@@ -115,7 +115,7 @@ module "google-cloud-yavin" {
     "ssh-rsa AAAAB3Nz...",
   ]
 
-  asset_dir          = "/home/user/.secrets/clusters/yavin"
+  asset_dir          = "./assets"
 
   # optional
   worker_count = 2
@@ -169,7 +169,7 @@ In 4-8 minutes, the Kubernetes cluster will be ready.
 [Install kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) on your system. Use the generated `kubeconfig` credentials to access the Kubernetes cluster and list nodes.
 
 ```
-$ export KUBECONFIG=/home/user/.secrets/clusters/yavin/auth/kubeconfig
+$ export KUBECONFIG=$PWD/assets/auth/kubeconfig
 $ kubectl get nodes
 NAME                                       ROLES              STATUS  AGE  VERSION
 yavin-controller-0.c.example-com.internal  controller,master  Ready   6m   v1.14.1
@@ -218,7 +218,8 @@ Check the [variables.tf](https://github.com/kinvolk/lokomotive-kubernetes/blob/m
 | dns_zone | Google Cloud DNS zone | "google-cloud.example.com" |
 | dns_zone_name | Google Cloud DNS zone name | "example-zone" |
 | ssh_keys | List of SSH public keys for user 'core' | ["ssh-rsa AAAAB3NZ..."] |
-| asset_dir | Path to a directory where generated assets should be placed (contains secrets) | "/home/user/.secrets/clusters/yavin" |
+| asset_dir | Path to a directory where generated assets should be placed (contains secrets) | "./assets" |
+
 
 Check the list of valid [regions](https://cloud.google.com/compute/docs/regions-zones/regions-zones) and list Flatcar Container Linux [images](https://cloud.google.com/compute/docs/images) with `gcloud compute images list | grep flatcar`.
 
@@ -263,4 +264,3 @@ Check the list of valid [machine types](https://cloud.google.com/compute/docs/ma
 #### Preemption
 
 Add `worker_preemeptible = true` to allow worker nodes to be [preempted](https://cloud.google.com/compute/docs/instances/preemptible) at random, but pay [significantly](https://cloud.google.com/compute/pricing) less. Clusters tolerate stopping instances fairly well (reschedules pods, but cannot drain) and preemption provides a nice reward for running fault-tolerant cluster systems.`
-
