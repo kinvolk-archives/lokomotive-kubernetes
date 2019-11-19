@@ -88,6 +88,7 @@ systemd:
         ExecStartPre=/usr/bin/bash -c "grep 'certificate-authority-data' /etc/kubernetes/kubeconfig | awk '{print $2}' | base64 -d > /etc/kubernetes/ca.crt"
         ExecStartPre=-/usr/bin/rkt rm --uuid-file=/var/cache/kubelet-pod.uuid
         ExecStartPre=/etc/kubernetes/configure-kubelet-cgroup-driver
+        ExecStartPre=/bin/ln -sf /dev/console /dev/kmsg
         ExecStart=/usr/lib/coreos/kubelet-wrapper \
           --node-ip=$${COREOS_PACKET_IPV4_PRIVATE_0} \
           --anonymous-auth=false \
