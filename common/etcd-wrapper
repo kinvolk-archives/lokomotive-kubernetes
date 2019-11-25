@@ -1,0 +1,63 @@
+#!/usr/bin/bash -e
+# Wrapper for launching etcd via docker.
+
+SYSTEMD_SERVICE_NAME="$1"; shift
+
+function require_ev_all() {
+	for rev in $@ ; do
+		if [[ -z "${!rev}" ]]; then
+			echo ${rev} is not set
+			exit 1
+		fi
+	done
+}
+
+function require_ev_one() {
+	for rev in $@ ; do
+		if [[ ! -z "${!rev}" ]]; then
+			return
+		fi
+	done
+	echo One of $@ must be set
+	exit 1
+}
+
+require_ev_one ETCD_IMAGE ETCD_IMAGE_TAG
+require_ev_all SYSTEMD_SERVICE_NAME ETCD_USER ETCD_DATA_DIR
+
+ETCD_IMAGE_URL="${ETCD_IMAGE_URL:-quay.io/coreos/etcd}"
+ETCD_IMAGE="${ETCD_IMAGE:-${ETCD_IMAGE_URL}:${ETCD_IMAGE_TAG}}"
+
+if [[ ! -e "${ETCD_DATA_DIR}" ]]; then
+	mkdir --parents "${ETCD_DATA_DIR}"
+	chown "${ETCD_USER}" "${ETCD_DATA_DIR}"
+fi
+
+# Do not pass ETCD_DATA_DIR through to the container. The default path,
+# /var/lib/etcd is always used inside the container.
+etcd_data_dir="${ETCD_DATA_DIR}"
+unset ETCD_DATA_DIR
+
+ETCD_SSL_DIR="${ETCD_SSL_DIR:-/etc/ssl/certs}"
+
+for i in $(env|grep ^ETCD_) ; do
+	DOCKER_ENV="${DOCKER_ENV} -e $i"
+done
+
+# TODO: systemd notify does not work with Docker
+DOCKER="${DOCKER:-/usr/bin/docker}"
+set -x
+exec ${DOCKER} ${DOCKER_GLOBAL_ARGS} \
+	run \
+	--name $SYSTEMD_SERVICE_NAME \
+	--entrypoint=/usr/local/bin/etcd \
+	--net=host \
+	--mount type=bind,bind-propagation=rshared,source=${etcd_data_dir},target=/var/lib/etcd \
+	--mount type=bind,bind-propagation=rprivate,source=${ETCD_SSL_DIR},target=/etc/ssl/certs,readonly \
+	--mount type=bind,bind-propagation=rprivate,source=/usr/share/ca-certificates,target=/usr/share/ca-certificates,readonly \
+	--mount type=bind,bind-propagation=rprivate,source=/etc/hosts,target=/etc/hosts,readonly \
+	--mount type=bind,bind-propagation=rprivate,source=/etc/resolv.conf,target=/etc/resolv.conf,readonly \
+	--user=$(id -u "${ETCD_USER}") \
+	${DOCKER_ENV} \
+	${ETCD_IMAGE} ${ETCD_IMAGE_ARGS} \
+	--data-dir=/var/lib/etcd "$@"

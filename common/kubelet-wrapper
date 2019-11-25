@@ -1,0 +1,67 @@
+#!/bin/bash -e
+# Wrapper for launching kubelet via docker.
+
+SYSTEMD_SERVICE_NAME="$1"; shift
+
+function require_ev_all() {
+	for rev in $@ ; do
+		if [[ -z "${!rev}" ]]; then
+			echo "${rev}" is not set
+			exit 1
+		fi
+	done
+}
+
+require_ev_all SYSTEMD_SERVICE_NAME KUBELET_IMAGE CLUSTER_DOMAIN_SUFFIX CLUSTER_DNS_SERVICE_IP
+
+mkdir -p /etc/kubernetes /var/lib/docker /var/lib/kubelet /run/kubelet
+
+readonly docker_cgroup_driver="$(docker info -f '{{.CgroupDriver}}')"
+if [[ "$docker_cgroup_driver" = "systemd" ]] ; then
+	for i in $(cat /proc/cgroups |awk '{print $1}'|grep -v subsys_name) ; do
+		# systemd does not create the entries for all cgroup controllers (e.g. hugetlb)
+		mkdir --parents /sys/fs/cgroup/$i/kubepods.slice
+	done
+fi
+
+KUBELET_MOUNT_RW="${KUBELET_MOUNT_RW:-} /sys/fs/cgroup /var/lib/calico /opt/cni/bin /var/lib/cni /etc/kubernetes /var/log /run /sys"
+for m in $KUBELET_MOUNT_RW ; do
+	KUBELET_MOUNT_ARGS="$KUBELET_MOUNT_ARGS --mount type=bind,bind-propagation=rprivate,source=$m,target=$m"
+done
+
+KUBELET_MOUNT_RO="${KUBELET_MOUNT_RO:-} /etc/ssl/certs /usr/share/ca-certificates /usr/lib/os-release /lib/modules /etc/machine-id"
+for m in $KUBELET_MOUNT_RO ; do
+	KUBELET_MOUNT_ARGS="$KUBELET_MOUNT_ARGS --mount type=bind,bind-propagation=rprivate,source=$m,target=$m,readonly"
+done
+
+if [[ "$NODE_ROLE" = "controller" ]] ; then
+	KUBELET_ARGS='
+		--register-with-taints=node-role.kubernetes.io/master=:NoSchedule
+		--node-labels=node.kubernetes.io/master
+		--node-labels=node.kubernetes.io/controller=true
+	'
+fi
+
+if [[ "$NODE_ROLE" = "worker" ]] ; then
+	KUBELET_ARGS='
+		--node-labels=node.kubernetes.io/node
+	'
+fi
+
+set -x
+exec /usr/bin/docker \
+	run --name $SYSTEMD_SERVICE_NAME \
+	--privileged --net=host --pid=host \
+	$KUBELET_MOUNT_ARGS \
+	--mount type=bind,bind-propagation=rslave,source=/var/lib/docker,target=/var/lib/docker \
+	--mount type=bind,bind-propagation=shared,source=/var/lib/kubelet,target=/var/lib/kubelet \
+	${KUBELET_IMAGE} /kubelet ${KUBELET_ARGS} \
+	--anonymous-auth=false --authentication-token-webhook --authorization-mode=Webhook \
+	--client-ca-file=/etc/kubernetes/ca.crt \
+	--cluster_dns=${CLUSTER_DNS_SERVICE_IP} --cluster_domain=${CLUSTER_DOMAIN_SUFFIX} \
+	--cni-conf-dir=/etc/kubernetes/cni/net.d --network-plugin=cni \
+	--config=/etc/kubernetes/kubelet.config --kubeconfig=/etc/kubernetes/kubeconfig \
+	--exit-on-lock-contention --lock-file=/var/run/lock/kubelet.lock \
+	--pod-manifest-path=/etc/kubernetes/manifests \
+	--read-only-port=0 \
+	--volume-plugin-dir=/var/lib/kubelet/volumeplugins

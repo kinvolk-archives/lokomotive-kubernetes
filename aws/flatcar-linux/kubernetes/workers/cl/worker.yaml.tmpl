@@ -29,20 +29,7 @@ systemd:
         Wants=rpc-statd.service
         [Service]
         EnvironmentFile=/etc/kubernetes/kubelet.env
-        Environment="RKT_RUN_ARGS=--uuid-file-save=/var/cache/kubelet-pod.uuid \
-          --volume=resolv,kind=host,source=/etc/resolv.conf \
-          --mount volume=resolv,target=/etc/resolv.conf \
-          --volume var-lib-cni,kind=host,source=/var/lib/cni \
-          --mount volume=var-lib-cni,target=/var/lib/cni \
-          --volume var-lib-calico,kind=host,source=/var/lib/calico \
-          --mount volume=var-lib-calico,target=/var/lib/calico \
-          --volume opt-cni-bin,kind=host,source=/opt/cni/bin \
-          --mount volume=opt-cni-bin,target=/opt/cni/bin \
-          --volume var-log,kind=host,source=/var/log \
-          --mount volume=var-log,target=/var/log \
-          --volume iscsiadm,kind=host,source=/usr/sbin/iscsiadm \
-          --mount volume=iscsiadm,target=/usr/sbin/iscsiadm \
-          --insecure-options=image"
+        Environment="KUBELET_MOUNT_RW=/usr/sbin/iscsiadm /dev/kmsg"
         ExecStartPre=/bin/mkdir -p /opt/cni/bin
         ExecStartPre=/bin/mkdir -p /etc/kubernetes/manifests
         ExecStartPre=/bin/mkdir -p /etc/kubernetes/cni/net.d
@@ -51,25 +38,10 @@ systemd:
         ExecStartPre=/bin/mkdir -p /var/lib/kubelet/volumeplugins
         ExecStartPre=/usr/bin/bash -c "grep 'certificate-authority-data' /etc/kubernetes/kubeconfig | awk '{print $2}' | base64 -d > /etc/kubernetes/ca.crt"
         ExecStartPre=/etc/kubernetes/configure-kubelet-cgroup-driver
-        ExecStartPre=-/usr/bin/rkt rm --uuid-file=/var/cache/kubelet-pod.uuid
-        ExecStart=/usr/lib/coreos/kubelet-wrapper \
-          --anonymous-auth=false \
-          --authentication-token-webhook \
-          --authorization-mode=Webhook \
-          --client-ca-file=/etc/kubernetes/ca.crt \
-          --cluster_dns=${cluster_dns_service_ip} \
-          --cluster_domain=${cluster_domain_suffix} \
-          --cni-conf-dir=/etc/kubernetes/cni/net.d \
-          --config=/etc/kubernetes/kubelet.config \
-          --exit-on-lock-contention \
-          --kubeconfig=/etc/kubernetes/kubeconfig \
-          --lock-file=/var/run/lock/kubelet.lock \
-          --network-plugin=cni \
-          --node-labels=node.kubernetes.io/node \
-          --pod-manifest-path=/etc/kubernetes/manifests \
-          --read-only-port=0 \
-          --volume-plugin-dir=/var/lib/kubelet/volumeplugins
-        ExecStop=-/usr/bin/rkt stop --uuid-file=/var/cache/kubelet-pod.uuid
+        ExecStartPre=-/usr/bin/docker stop %n
+        ExecStartPre=-/usr/bin/docker rm %n
+        ExecStart=/etc/kubernetes/kubelet-wrapper %n
+        ExecStop=/usr/bin/docker stop %n
         Restart=always
         RestartSec=5
         [Install]
@@ -99,8 +71,10 @@ storage:
       mode: 0644
       contents:
         inline: |
-          KUBELET_IMAGE_URL=docker://k8s.gcr.io/hyperkube
-          KUBELET_IMAGE_TAG=v1.16.2
+          KUBELET_IMAGE=k8s.gcr.io/hyperkube:v1.16.2
+          CLUSTER_DNS_SERVICE_IP=${cluster_dns_service_ip}
+          CLUSTER_DOMAIN_SUFFIX=${cluster_domain_suffix}
+          NODE_ROLE=worker
     - path: /etc/sysctl.d/max-user-watches.conf
       filesystem: root
       contents:
@@ -135,6 +109,11 @@ storage:
             --net=host \
             --dns=host \
             --exec=/kubectl -- --kubeconfig=/etc/kubernetes/kubeconfig delete node $(hostname)
+    - path: /etc/kubernetes/kubelet-wrapper
+      filesystem: root
+      mode: 0744
+      contents:
+        inline: ${kubelet_wrapper_inline}
 passwd:
   users:
     - name: core
