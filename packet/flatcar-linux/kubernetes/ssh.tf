@@ -69,7 +69,7 @@ resource "null_resource" "copy-controller-secrets" {
 resource "null_resource" "bootkube-start" {
   depends_on = [
     module.bootkube,
-    aws_route53_record.apiservers,
+    module.dns-entries,
     null_resource.copy-controller-secrets,
   ]
 
