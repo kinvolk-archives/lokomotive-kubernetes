@@ -13,8 +13,7 @@ resource "null_resource" "dns-etcd" {
   }
 
   provisioner "local-exec" {
-    # TODO: fix route
-    command = format("/home/mvb/lokomotive-kubernetes/packet/flatcar-linux/kubernetes/dns/check_dns.sh")
+    command = "${path.module}/check_dns.sh"
     on_failure = fail
 
     environment = {
