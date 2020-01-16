@@ -1,39 +1,58 @@
 # Discrete DNS records for each controller's private IPv4 for etcd usage
 resource "aws_route53_record" "etcds" {
-  count = var.controller_count
+  count = var.dns_zone_id == "" ? 0 : var.controller_count
 
   # DNS Zone where record should be created
   zone_id = var.dns_zone_id
 
-  name = format("%s-etcd%d.%s.", var.cluster_name, count.index, var.dns_zone)
+  name = null_resource.dns_entries[count.index].triggers.etcd_fqdn
   type = "A"
   ttl  = 300
 
   # private IPv4 address for etcd
-  records = [packet_device.controllers[count.index].access_private_ipv4]
+  records = [null_resource.dns_entries[count.index].triggers.etcd_ip]
+}
+
+resource "null_resource" "dns_entries" {
+  count = var.controller_count
+
+  triggers = {
+    etcd_fqdn = format("%s-etcd%d.%s.", var.cluster_name, count.index, var.dns_zone)
+    etcd_ip   = packet_device.controllers[count.index].access_private_ipv4
+
+    apiserver_fqdn = format("%s.%s.", var.cluster_name, var.dns_zone),
+    apiserver_ip   = packet_device.controllers[count.index].access_public_ipv4,
+
+    apiserver_private_fqdn = format("%s-private.%s.", var.cluster_name, var.dns_zone),
+    apiserver_private_ip   = packet_device.controllers[count.index].access_private_ipv4,
+  }
 }
 
 # DNS record for the API servers
 resource "aws_route53_record" "apiservers" {
-  zone_id = var.dns_zone_id
+  count = var.dns_zone_id == "" ? 0 : 1
 
-  name = format("%s.%s.", var.cluster_name, var.dns_zone)
+  zone_id = var.dns_zone_id == "" ? 0 : var.dns_zone_id
+
+  name = null_resource.dns_entries[count.index].triggers.apiserver_fqdn
   type = "A"
   ttl  = "300"
 
   # TODO - verify that a multi-controller setup actually works
-  records = packet_device.controllers.*.access_public_ipv4
+  records = null_resource.dns_entries.*.triggers.apiserver_ip
 }
 
 resource "aws_route53_record" "apiservers_private" {
-  zone_id = var.dns_zone_id
+  count = var.dns_zone_id == "" ? 0 : 1
 
-  name = format("%s-private.%s.", var.cluster_name, var.dns_zone)
+  zone_id = var.dns_zone_id == "" ? 0 : var.dns_zone_id
+
+  name = null_resource.dns_entries[count.index].triggers.apiserver_private_fqdn
   type = "A"
   ttl  = "300"
 
   # TODO - verify that a multi-controller setup actually works
-  records = packet_device.controllers.*.access_private_ipv4
+  records = null_resource.dns_entries.*.triggers.apiserver_private_ip
 }
 
 resource "packet_device" "controllers" {

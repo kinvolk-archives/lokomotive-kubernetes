@@ -7,12 +7,13 @@ variable "cluster_name" {
 
 variable "dns_zone" {
   type        = string
-  description = "AWS Route53 DNS Zone (e.g. aws.example.com)"
+  description = "DNS Zone (e.g. aws.example.com)"
 }
 
 variable "dns_zone_id" {
   type        = string
-  description = "AWS Route53 DNS Zone ID (e.g. Z3PAABBCFAKEC0)"
+  description = "AWS Route53 DNS Zone ID (e.g. Z3PAABBCFAKEC0). Set if you want cluster DNS entries to be managed and created in AWS Route53"
+  default     = ""
 }
 
 variable "project_id" {
