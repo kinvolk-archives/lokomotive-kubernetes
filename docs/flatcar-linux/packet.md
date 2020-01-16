@@ -245,6 +245,11 @@ supernova-helium-worker-1  Ready   node               10m  v1.14.1
 
 Learn about [maintenance](../topics/maintenance.md).
 
+## Plugins
+
+For clusters that need a network load balancer and ingress [(explanation)](https://kubernetes.github.io/ingress-nginx/deploy/baremetal/#a-pure-software-solution-metallb) check out the following optional module  
+[lokomotive-kubernetes-metallb](https://github.com/DGollings/lokomotive-kubernetes-metallb)
+
 ## ARM Support and Hybrid Clusters
 
 Lokomotive and Flatcar currently include an alpha-quality preview for the Packet arm64 server types `c1.large.arm` and `c2.large.arm`.
