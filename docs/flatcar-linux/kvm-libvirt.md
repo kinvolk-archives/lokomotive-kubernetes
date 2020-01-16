@@ -16,7 +16,7 @@ A generated `kubeconfig` provides `kubectl` access to the cluster.
 * At least 4 GB of free RAM
 * Running libvirtd system service, see [libvirtd Setup](#libvirtd-setup)
 * A user in the `libvirt` group (to create virtual machines with libvirt and access `/dev/kvm`), see [User Setup]
-* Terraform v0.11.x, [terraform-provider-ct](https://github.com/poseidon/terraform-provider-ct),
+* Terraform v0.12.x, [terraform-provider-ct](https://github.com/poseidon/terraform-provider-ct),
   and [terraform-provider-libvirt](https://github.com/dmacvicar/terraform-provider-libvirt)
   installed locally
 
@@ -188,7 +188,7 @@ module "worker-pool-one" {
     libvirt  = libvirt.default
   }
 
-  ssh_keys = "module.controller.ssh_keys
+  ssh_keys = module.controller.ssh_keys
 
   machine_domain = module.controller.machine_domain
   cluster_name = module.controller.cluster_name
@@ -309,7 +309,7 @@ source.
 |:-----|:------------|:--------|:--------|
 | cluster_domain_suffix | Queries for domains with the suffix will be answered by coredns | "cluster.local" | "k8s.example.com" |
 | controller_count | Number of controller VMs | 1 | 1 |
-| enable_aggregation | Enable the Kubernetes Aggregation Layer | false | true |
+| enable_aggregation | Enable the Kubernetes Aggregation Layer | true | false |
 | enable_reporting | Enable usage or analytics reporting to upstreams (Calico) | false | true |
 | network_mtu | CNI interface MTU (applies to calico only) | 1480 | 8981 |
 | network_ip_autodetection_method | Method to autodetect the host IPv4 address (applies to calico only) | "first-found" or "can-reach=192.168.192.1" |
