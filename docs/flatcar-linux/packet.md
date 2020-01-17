@@ -61,35 +61,6 @@ provider "aws" {
   region                  = "eu-central-1"
   shared_credentials_file = "/home/user/.config/aws/credentials"
 }
-
-provider "ct" {
-  version = "0.4.0"
-}
-
-provider "local" {
-  version = "~> 1.2"
-  alias   = "default"
-}
-
-provider "null" {
-  version = "~> 2.1"
-  alias   = "default"
-}
-
-provider "template" {
-  version = "~> 2.1"
-  alias   = "default"
-}
-
-provider "tls" {
-  version = "~> 2.0"
-  alias   = "default"
-}
-
-provider "packet" {
-  version = "~> 2.7.3"
-  alias   = "default"
-}
 ```
 
 Additional configuration options are described in the `aws` provider [docs](https://www.terraform.io/docs/providers/aws/).
@@ -117,15 +88,6 @@ locals {
 
 module "controller" {
   source = "git::https://github.com/kinvolk/lokomotive-kubernetes//packet/flatcar-linux/kubernetes?ref=<hash>"
-
-  providers = {
-    aws      = aws.default
-    local    = local.default
-    null     = null.default
-    template = template.default
-    tls      = tls.default
-    packet   = packet.default
-  }
 
   # Route53
   dns_zone    = "packet.example.com"
