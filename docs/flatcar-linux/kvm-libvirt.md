@@ -139,8 +139,8 @@ module "controller" {
   asset_dir = "./assets"
 
   machine_domain = "vmcluster.k8s"
-  cluster_name = "vmcluster"
-  node_ip_pool = "192.168.192.0/24"
+  cluster_name   = "vmcluster"
+  node_ip_pool   = "192.168.192.0/24"
 
   controller_count = 1
 }
@@ -151,9 +151,9 @@ module "worker-pool-one" {
   ssh_keys = module.controller.ssh_keys
 
   machine_domain = module.controller.machine_domain
-  cluster_name = module.controller.cluster_name
-  libvirtpool = module.controller.libvirtpool
-  libvirtbaseid = module.controller.libvirtbaseid
+  cluster_name   = module.controller.cluster_name
+  libvirtpool    = module.controller.libvirtpool
+  libvirtbaseid  = module.controller.libvirtbaseid
 
   pool_name = "one"
 

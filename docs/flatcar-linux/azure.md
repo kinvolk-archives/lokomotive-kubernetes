@@ -109,11 +109,11 @@ module "azure-ramius" {
     "ssh-rsa AAAAB3Nz...",
   ]
 
-  asset_dir          = "./assets"
+  asset_dir = "./assets"
 
   # optional
-  worker_count    = 2
-  host_cidr       = "10.0.0.0/20"
+  worker_count = 2
+  host_cidr    = "10.0.0.0/20"
 }
 ```
 

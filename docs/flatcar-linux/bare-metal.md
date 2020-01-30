@@ -159,20 +159,20 @@ module "bare-metal-mercury" {
   source = "git::https://github.com/kinvolk/lokomotive-kubernetes//bare-metal/flatcar-linux/kubernetes?ref=<hash>"
 
   # bare-metal
-  cluster_name            = "mercury"
-  matchbox_http_endpoint  = "http://matchbox.example.com"
-  os_channel              = "flatcar-stable"
-  os_version              = "1632.3.0"
+  cluster_name           = "mercury"
+  matchbox_http_endpoint = "http://matchbox.example.com"
+  os_channel             = "flatcar-stable"
+  os_version             = "1632.3.0"
 
   # configuration
-  k8s_domain_name    = "node1.example.com"
+  k8s_domain_name = "node1.example.com"
 
   ssh_keys = [
     "ssh-rsa AAAAB3Nz...",
     "ssh-rsa AAAAB3Nz...",
   ]
 
-  asset_dir          = "./assets"
+  asset_dir = "./assets"
 
   # machines
   controller_names   = ["node1"]

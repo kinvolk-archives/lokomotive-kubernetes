@@ -83,7 +83,7 @@ module "controller" {
   source = "git::https://github.com/kinvolk/lokomotive-kubernetes//packet/flatcar-linux/kubernetes?ref=<hash>"
 
   # DNS configuration
-  dns_zone    = "myclusters.example.com"
+  dns_zone = "myclusters.example.com"
 
   # configuration
   ssh_keys = [
@@ -103,7 +103,7 @@ module "controller" {
   controller_type  = "t1.small.x86"
 
   management_cidrs = [
-    "0.0.0.0/0",       # Instances can be SSH-ed into from anywhere on the internet.
+    "0.0.0.0/0", # Instances can be SSH-ed into from anywhere on the internet.
   ]
 
   # This is different for each project on Packet and depends on the packet facility/region.
@@ -118,7 +118,7 @@ module "controller" {
 module "dns" {
   source = "git::https://github.com/kinvolk/lokomotive-kubernetes//dns/route53?ref=<hash>"
 
-  entries = module.controller.dns_entries
+  entries     = module.controller.dns_entries
   aws_zone_id = "Z1_FAKE" # Z23ABC4XYZL05B for instance
 }
 
@@ -136,7 +136,7 @@ module "worker-pool-helium" {
   pool_name    = "helium"
 
   worker_count = 2
-  type  = "t1.small.x86"
+  type         = "t1.small.x86"
 
   kubeconfig = module.controller.kubeconfig
 

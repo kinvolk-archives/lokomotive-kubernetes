@@ -44,7 +44,7 @@ module "aws-tempest" {
     "ssh-rsa AAAAB3Nz...",
   ]
 
-  asset_dir          = "./assets"
+  asset_dir = "./assets"
 
   # optional
   worker_count = 2
