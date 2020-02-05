@@ -247,7 +247,7 @@ Check the [variables.tf](https://github.com/kinvolk/lokomotive-kubernetes/blob/m
 | project_id | Project ID obtained from the Packet account | "93fake81-0f3c1-..." |
 | facility | Packet Region in which the instance(s) should be deployed | https://www.packet.com/developers/api/#facilities. Eg: "ams1" |
 | management_cidrs | List of CIDRs to allow SSH access to the nodes | ["153.79.80.1/16", "59.60.10.1/32"] |
-| node_private_cidr | Private CIDR obtained from Packet for the project and facility | 10.128.16.32/25 |
+| node_private_cidr | Private CIDR obtained from Packet for the project and facility. Note: not guaranteed to be stable if a project is empty/dormant, (re)check in case of networking inconsistencies | 10.128.16.32/25 |
 
 #### Worker module
 
