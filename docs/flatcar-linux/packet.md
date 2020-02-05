@@ -110,6 +110,10 @@ module "controller" {
   # Check yours from the `IPs & Networks` tab from your Packet.net account.
   # If an IP block is not allocated yet, try provisioning an instance from the console in
   # that region. Packet will allocate a public IP CIDR.
+  # Note: the private CIDR range has been observed to change unexpectedly, 
+  # although at the time it was an empty/dormant Packet project and there had been some networking upgrades
+  # be sure to manually check this value again when either reusing an older project 
+  # or see unexplainable networking behaviour (inter-node timeouts)
   node_private_cidr = "10.128.156.0/25"
 }
 
