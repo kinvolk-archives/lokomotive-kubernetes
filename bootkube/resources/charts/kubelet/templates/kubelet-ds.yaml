@@ -43,6 +43,7 @@ spec:
           --network-plugin=cni \
           --pod-manifest-path=/etc/kubernetes/manifests \
           --read-only-port=0 \
+          --healthz-bind-address=$(HOST_IP) \
           --volume-plugin-dir=/var/lib/kubelet/volumeplugins \
           --node-labels=$(grep NODE_LABELS /etc/kubernetes/kubelet.env | cut -d'"' -f2) \
           --register-with-taints=$(grep NODE_TAINTS /etc/kubernetes/kubelet.env | cut -d'"' -f2)
@@ -56,6 +57,14 @@ spec:
               fieldPath: status.hostIP
         securityContext:
           privileged: true
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 10248
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 10248
         volumeMounts:
         - mountPath: /var/lib/cni
           name: coreos-var-lib-cni
