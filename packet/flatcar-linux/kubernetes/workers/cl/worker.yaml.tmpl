@@ -17,6 +17,11 @@ systemd:
         RequiredBy=kubelet.service
     - name: docker.service
       enable: true
+      dropins:
+      - name: 90-docker.conf
+        contents: |
+          [Service]
+          Environment="DOCKER_OPTS=--exec-opt native.cgroupdriver=systemd"
     - name: locksmithd.service
       mask: true
     - name: wait-for-dns.service
