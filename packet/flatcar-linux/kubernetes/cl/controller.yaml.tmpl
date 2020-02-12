@@ -11,7 +11,7 @@ systemd:
             After=create-etcd-config.service
             [Service]
             EnvironmentFile=/etc/kubernetes/etcd.config
-            Environment="ETCD_IMAGE_URL=${etcd_arch_url_prefix}quay.io/coreos/etcd"
+            Environment="ETCD_IMAGE_URL=${etcd_arch_url_prefix}gcr.io/etcd-development/etcd"
             Environment="ETCD_IMAGE_TAG=v3.4.3${etcd_arch_tag_suffix}"
             Environment="ETCD_NAME=${etcd_name}"
             Environment="ETCD_ADVERTISE_CLIENT_URLS=https://${etcd_domain}:2379"
