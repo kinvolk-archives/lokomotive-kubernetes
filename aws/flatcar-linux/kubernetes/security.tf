@@ -10,6 +10,7 @@ resource "aws_security_group" "controller" {
 
   tags = {
     "Name" = "${var.cluster_name}-controller"
+    "Comment" = var.comment
   }
 }
 
@@ -191,6 +192,7 @@ resource "aws_security_group" "worker" {
 
   tags = {
     "Name" = "${var.cluster_name}-worker"
+    "Comment" = var.comment
   }
 }
 

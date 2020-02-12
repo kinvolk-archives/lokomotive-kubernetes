@@ -39,6 +39,11 @@ resource "aws_autoscaling_group" "workers" {
       value               = "${var.name}-worker"
       propagate_at_launch = true
     },
+    {
+      key                 = "Comment"
+      value               = "${var.comment}"
+      propagate_at_launch = true
+    },
   ]
 }
 

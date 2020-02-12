@@ -11,6 +11,7 @@ resource "aws_vpc" "network" {
 
   tags = {
     "Name" = var.cluster_name
+    "Comment" = var.comment
   }
 }
 
@@ -19,6 +20,7 @@ resource "aws_internet_gateway" "gateway" {
 
   tags = {
     "Name" = var.cluster_name
+    "Comment" = var.comment
   }
 }
 
@@ -37,6 +39,7 @@ resource "aws_route_table" "default" {
 
   tags = {
     "Name" = var.cluster_name
+    "Comment" = var.comment
   }
 }
 
@@ -55,6 +58,7 @@ resource "aws_subnet" "public" {
 
   tags = {
     "Name" = "${var.cluster_name}-public-${count.index}"
+    "Comment" = var.comment
   }
 }
 

@@ -19,6 +19,7 @@ resource "aws_instance" "controllers" {
 
   tags = {
     Name = "${var.cluster_name}-controller-${count.index}"
+    Comment = "${var.comment}"
   }
 
   instance_type = var.controller_type

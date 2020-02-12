@@ -88,6 +88,12 @@ variable "clc_snippets" {
   default     = []
 }
 
+variable "comment" {
+  type        = string
+  default     = ""
+  description = "Optional comment to add as a tag on AWS resources"
+}
+
 # configuration
 
 variable "kubeconfig" {
