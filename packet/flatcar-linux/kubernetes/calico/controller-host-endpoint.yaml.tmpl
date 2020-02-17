@@ -1,3 +1,4 @@
+%{~ for node_name in node_names }
 ---
 apiVersion: crd.projectcalico.org/v1
 kind: HostEndpoint
@@ -9,3 +10,4 @@ metadata:
 spec:
   interfaceName: bond0
   node: "${node_name}"
+%{~ endfor ~}

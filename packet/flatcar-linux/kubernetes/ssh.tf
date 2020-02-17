@@ -69,6 +69,8 @@ resource "null_resource" "copy-assets-dir" {
   depends_on = [
     module.bootkube,
     null_resource.copy-controller-secrets,
+    local_file.host_endpoint_controller,
+    local_file.host_protection_policy,
   ]
 
   connection {
@@ -84,43 +86,12 @@ resource "null_resource" "copy-assets-dir" {
   }
 }
 
-// copy the calico hostendpoint controller manifests only when networking is calico
-// TODO: convert these templates to helm charts for calico host endpoint controller
-// Currently the manfifests are copied over to the calico helm chart.
-resource "null_resource" "calico-host-endpoint-manifests" {
-  count = var.networking == "calico" ? 1 : 0
-
-  depends_on = [
-    module.bootkube,
-    null_resource.copy-controller-secrets,
-    null_resource.copy-assets-dir,
-  ]
-
-  connection {
-    type    = "ssh"
-    host    = packet_device.controllers[0].access_public_ipv4
-    user    = "core"
-    timeout = "15m"
-  }
-
-  provisioner "file" {
-    content     = data.template_file.host_protection_policy.rendered
-    destination = "$HOME/assets/charts/kube-system/calico/templates/calico-policy.yaml"
-  }
-
-  provisioner "file" {
-    source      = "${path.module}/calico/host-endpoint-controller.yaml"
-    destination = "$HOME/assets/charts/kube-system/calico/templates/host-endpoint-controller.yaml"
-  }
-}
-
 # start bootkube to perform one-time self-hosted cluster bootstrapping.
 resource "null_resource" "bootkube-start" {
   depends_on = [
     module.bootkube,
     null_resource.copy-controller-secrets,
     null_resource.copy-assets-dir,
-    null_resource.calico-host-endpoint-manifests,
   ]
 
   connection {
@@ -138,25 +109,24 @@ resource "null_resource" "bootkube-start" {
   }
 }
 
-data "template_file" "controller_host_endpoints" {
-  count    = var.controller_count
-  template = file("${path.module}/calico/controller-host-endpoint.yaml.tmpl")
+resource "local_file" "host_endpoint_controller" {
+  count = var.networking == "calico" ? 1 : 0
 
-  vars = {
-    node_name = packet_device.controllers[count.index].hostname
-  }
+  content  = file("${path.module}/calico/host-endpoint-controller.yaml")
+  filename = "${var.asset_dir}/charts/kube-system/calico/templates/host-endpoint-controller.yaml"
 }
 
-data "template_file" "host_protection_policy" {
-  template = file("${path.module}/calico/host-protection.yaml.tmpl")
+resource "local_file" "host_protection_policy" {
+  count = var.networking == "calico" ? 1 : 0
 
-  vars = {
-    controller_host_endpoints = join(
-      "\n",
-      data.template_file.controller_host_endpoints.*.rendered,
-    )
+  content = templatefile("${path.module}/calico/host-protection.yaml.tmpl", {
+    controller_host_endpoints = templatefile("${path.module}/calico/controller-host-endpoint.yaml.tmpl", {
+      node_names = packet_device.controllers.*.hostname
+    })
     management_cidrs       = jsonencode(var.management_cidrs)
     cluster_internal_cidrs = jsonencode([var.node_private_cidr, var.pod_cidr, var.service_cidr])
     etcd_server_cidrs      = jsonencode(packet_device.controllers.*.access_private_ipv4)
-  }
+  })
+
+  filename = "${var.asset_dir}/charts/kube-system/calico/templates/host-protection.yaml"
 }
