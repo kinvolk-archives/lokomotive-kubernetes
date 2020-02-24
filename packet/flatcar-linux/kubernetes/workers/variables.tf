@@ -169,3 +169,9 @@ variable "tags" {
   type        = list(string)
   default     = ["ManagedBy:Lokomotive", "CreatedBy:Unspecified"]
 }
+
+variable "use_ccm" {
+  description = "Sets kubelet's --cloud-provider=external flag. This causes all nodes to be initially tainted and requires running Cloud Controller Manager (CCM) to untaint them."
+  type        = bool
+  default     = false
+}

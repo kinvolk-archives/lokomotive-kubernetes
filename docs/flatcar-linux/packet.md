@@ -341,6 +341,7 @@ Lokomotive implements support for some [DNS providers](../dns/), if your provide
 | reservation_ids_default | Default hardware reservation ID for nodes not listed in the `reservation_ids` map. | "" | "next-available"|
 | clc_snippets [[1]](#clc-snippets-limitation) | Worker Container Linux Config snippets | [] | [example](../advanced/customization.md#usage) |
 | tags | Tags for Packet instances. The tags are not directly exposed to Kubernetes but can be fetched via Packet API | ["ManagedBy:Lokomotive", "CreatedBy:Unspecified"] | ["ManagedBy:Lokomotive", "CreatedBy:DevOpsTeam"] |
+| use-ccm | Run Kubelet with --cloud-provider=external flag. All nodes will be tainted until [CCM](https://kubernetes.io/docs/tasks/administer-cluster/running-cloud-controller/) is deployed. | false | true |
 
 Documentation about Packet hardware reservation id can be found here: https://support.packet.com/kb/articles/reserved-hardware.
 
