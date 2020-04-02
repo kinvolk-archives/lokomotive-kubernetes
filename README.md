@@ -1,3 +1,5 @@
+_*IMPORTANT*: Further development on Lokomotive is happening at https://github.com/kinvolk/lokomotive. The new repo brings together several repos; adding a commandline tool, Lokomotive components and improved documentation._
+
 # Lokomotive <img align="right" width=384 src="docs/images/lokomotive-logo.svg">
 
 Lokomotive is an open source project by [Kinvolk](https://kinvolk.io/) which distributes pure upstream Kubernetes.
