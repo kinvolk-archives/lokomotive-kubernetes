@@ -84,6 +84,7 @@ systemd:
           --cni-conf-dir=/etc/kubernetes/cni/net.d \
           --config=/etc/kubernetes/kubelet.config \
           --exit-on-lock-contention \
+          --healthz-port=0 \
           --kubeconfig=/etc/kubernetes/kubeconfig \
           --lock-file=/var/run/lock/kubelet.lock \
           --hostname-override=${etcd_domain} \
