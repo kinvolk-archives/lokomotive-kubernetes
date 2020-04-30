@@ -107,6 +107,9 @@ systemd:
             --pod-manifest-path=/etc/kubernetes/manifests \
             --read-only-port=0 \
             --register-with-taints=$${NODE_TAINTS} \
+            %{~ if use_ccm ~}
+            --cloud-provider=external \
+            %{~ endif ~}
             --volume-plugin-dir=/var/lib/kubelet/volumeplugins"
         ExecStop=-/usr/bin/rkt stop --uuid-file=/var/cache/kubelet-pod.uuid
         Restart=always
